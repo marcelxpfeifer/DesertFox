@@ -18,9 +18,6 @@ public class AnimationController : MonoBehaviour
     private bool didPositionChange;
     private bool isGrounded;
     private bool isJumping;
-    private float gravity;
-
-    Vector3 velocity;
 
     // Start is called before the first frame update
     void Start()
@@ -33,16 +30,9 @@ public class AnimationController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        watchGravityVelocity();
         watchPositionDiff();
         watchGroundedState();
         watchJumpingState();
-    }
-
-    void watchGravityVelocity()
-    {
-        velocity = playerController.velocity;
-        gravity = playerController.gravity;
     }
 
     void watchGroundedState()
@@ -52,9 +42,12 @@ public class AnimationController : MonoBehaviour
 
     void watchJumpingState()
     {
+        Debug.Log("Watchung Jump State");
+        Debug.Log(isGrounded);
         if(Input.GetButtonDown("Jump") && isGrounded)
         {
-            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+            Debug.Log("Jumping");
+            playerController.velocity.y = Mathf.Sqrt(jumpHeight * -2f * playerController.gravity);
         }
     }
 

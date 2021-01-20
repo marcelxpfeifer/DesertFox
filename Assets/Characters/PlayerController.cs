@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour
     public CharacterController characterController;
 
     public float speed = 12f;
-    public float gravity = 9.81f;
+    public float gravity = -9.81f;
 
     public Vector3 velocity;
     
