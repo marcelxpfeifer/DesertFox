@@ -1,96 +1,81 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Numerics;
 using UnityEngine;
+using Quaternion = UnityEngine.Quaternion;
+using Vector3 = UnityEngine.Vector3;
 
 public class MainCharacterController : MonoBehaviour
 {
+    private TextMesh _debugText;
+    
     private Animator _animator;
     
     [SerializeField] private float movementSpeed = 4f;
-    private Vector3 forward, right;
+    private Vector3 _forward, _right;
     private MousePositionInWorld _mousePosition;
     
-    private CharacterController controller;
+    private CharacterController _controller;
 
     [SerializeField] private float speed = 4f;
     [SerializeField] private float gravity = -9.81f;
 
     [SerializeField] private float playerSpeed = 4f;
-    [SerializeField] private float jumpHeight = 1f;
+    [SerializeField] private float jumpHeight = 0.2f;
     
-    private Vector3 lastPosition;
     [SerializeField] private Vector3 velocity;
-    private bool playerGrounded;
+
+    private float _directionY;
     
     void Start()
     {
-        forward = Camera.main.transform.forward;
-        forward.y = 0;
-        forward = Vector3.Normalize(forward);
-        right = Quaternion.Euler(new Vector3(0, 90, 0)) * forward;
+        _forward = Camera.main.transform.forward;
+        _forward.y = 0;
+        _forward = Vector3.Normalize(_forward);
+        _right = Quaternion.Euler(new Vector3(0, 90, 0)) * _forward;
         
         _mousePosition = gameObject.AddComponent<MousePositionInWorld>();
 
-        controller = gameObject.GetComponent<CharacterController>();
+        _controller = gameObject.GetComponent<CharacterController>();
         _animator = gameObject.GetComponent<Animator>();
+        _debugText = gameObject.AddComponent<TextMesh>();
     }
 
     void Update()
     {
-        Debug.Log(controller.isGrounded);
-        
-        if (controller.isGrounded && velocity.y < 0)
-        {
-            velocity.y = 0f;
-        }
+        Move();
+            
+        _debugText.text = "isGrounded " + _controller.isGrounded;
 
-        Vector3 move = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
-        controller.Move(move * (Time.deltaTime * playerSpeed));
-
-        if (move != Vector3.zero)
-        {
-            gameObject.transform.forward = move;
-        }
-
-        if (Input.GetButtonDown("Jump"))
-        {
-            velocity.y += Mathf.Sqrt(jumpHeight * -3.0f * gravity);
-        }
-        
-        velocity.y += gravity * Time.deltaTime;
-        controller.Move(velocity * Time.deltaTime);
-        
-        // NewMove();
         WatchVelocity();
-    }
-
-    void NewMove()
-    {
-        float x = Input.GetAxis("Horizontal");
-        float z = Input.GetAxis("Vertical");
-
-        Vector3 move = transform.right * x + transform.forward * z;
-
-        controller.Move(move * speed * Time.deltaTime);
-
-        velocity.y += gravity * Time.deltaTime;
-
-        controller.Move(velocity * Time.deltaTime);
-
-        Vector3 lookAtPosition = new Vector3(_mousePosition.worldPosition.x, transform.position.y, _mousePosition.worldPosition.z);
-        transform.LookAt(lookAtPosition);
     }
 
     void Move()
     {
-        Vector3 rightMovement = right * (movementSpeed * Time.deltaTime * Input.GetAxis("Horizontal"));
-        Vector3 upMovement = forward * (movementSpeed * Time.deltaTime * Input.GetAxis("Vertical"));
+        float hInput = Input.GetAxis("Horizontal");
+        float vInput = Input.GetAxis("Vertical");
 
-        transform.position += rightMovement;
-        transform.position += upMovement;
+        Vector3 direction = _forward * vInput + _right * hInput;
 
-        Vector3 lookAtPosition = new Vector3(_mousePosition.worldPosition.x, transform.position.y, _mousePosition.worldPosition.z);
-        transform.LookAt(lookAtPosition);
+        if (_controller.isGrounded)
+        {
+            if (Input.GetButton("Jump"))
+            {
+                _directionY = Mathf.Sqrt(jumpHeight * -3.0f * gravity);
+            }
+        }
+
+        _directionY += gravity * Time.deltaTime;
+
+        direction.y = _directionY;
+
+        _controller.Move(direction * (movementSpeed * Time.deltaTime));
+        
+        if (direction != Vector3.zero)
+        {
+            Vector3 mPos = _mousePosition.worldPosition;
+            gameObject.transform.LookAt(new Vector3(mPos.x, transform.position.y, mPos.z));
+        }
     }
 
     void WatchVelocity()
