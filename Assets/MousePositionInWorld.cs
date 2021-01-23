@@ -5,12 +5,16 @@ using UnityEngine;
 
 public class MousePositionInWorld : MonoBehaviour
 {
-    private Plane _plane = new Plane(Vector3.up, 0);
+    private Plane _plane;
 
     [SerializeField] private Transform offset;
     
     public Vector3 worldPosition;
-    
+
+    private void Awake()
+    {
+        _plane = new Plane(Vector3.up, offset.position.y);
+    }
 
     void Update()
     {

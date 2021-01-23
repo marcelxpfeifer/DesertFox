@@ -1,4 +1,5 @@
 using UnityEngine;
+using VehicleBehaviour;
 using Quaternion = UnityEngine.Quaternion;
 using Vector3 = UnityEngine.Vector3;
 
@@ -10,6 +11,7 @@ public class MainCharacterController : MonoBehaviour
     private MousePositionInWorld _mousePosition;
     
     private CharacterController _characterController;
+    private CameraController _cameraController;
 
     [SerializeField] private float movementSpeed = 4f;
     [SerializeField] private float jumpHeight = 0.2f;
@@ -20,9 +22,12 @@ public class MainCharacterController : MonoBehaviour
 
     private float _directionY;
 
+    private WheelVehicle vehicle;
+
     private void Awake()
     {
         _characterController = GetComponent<CharacterController>();
+        _cameraController = Camera.main.GetComponent<CameraController>();
         _mousePosition = gameObject.GetComponent<MousePositionInWorld>();
         _animator = gameObject.GetComponent<Animator>();
         
@@ -32,8 +37,38 @@ public class MainCharacterController : MonoBehaviour
         _right = Quaternion.Euler(new Vector3(0, 90, 0)) * _forward;
     }
 
+    public void getOutOfVehicle(Vector3 position, Quaternion rotation)
+    {
+        if (vehicle == null) return;
+
+        vehicle = null;
+        
+        transform.position = position;
+        transform.rotation = rotation;
+    }
+
+
+    public void getIntoVehicle(WheelVehicle wheelVehicle)
+    {
+        vehicle = wheelVehicle;
+        
+        // Todo: stop rendering player
+    }
+
     void Update()
     {
+        if (vehicle != null)
+        {
+            _characterController.enabled = false;
+            return;
+        }
+        else
+        {
+            _characterController.enabled = true;
+        }
+
+        _cameraController.target = transform;
+
         Move();
         WatchVelocity();
     }
@@ -68,6 +103,7 @@ public class MainCharacterController : MonoBehaviour
 
     void WatchVelocity()
     {
+        // Todo: Can most of this be replaced with a dot-product?
         Vector3 inputDirection = new Vector3(Input.GetAxis("Horizontal") * -1, 0, Input.GetAxis("Vertical"));
         
         Quaternion camRot = Quaternion.LookRotation(_forward);
@@ -76,10 +112,7 @@ public class MainCharacterController : MonoBehaviour
         Quaternion lookRot = Quaternion.LookRotation(lookDirection);
 
         Vector3 rotatedInput = lookRot * inputDirection;
-        
-        Debug.DrawLine(transform.position + Vector3.up, lookDirection);
-        Debug.DrawLine(Vector3.up, rotatedInput);
-        
+
         _animator.SetFloat("velocityRight", rotatedInput.z, 0.1f, Time.deltaTime);
         _animator.SetFloat("velocityForward", rotatedInput.x, 0.1f, Time.deltaTime);
     }

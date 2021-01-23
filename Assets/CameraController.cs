@@ -5,7 +5,7 @@ using UnityEngine;
 public class CameraController : MonoBehaviour
 {
 
-    [SerializeField] private Transform target;
+    [SerializeField] public Transform target;
     [SerializeField] private float smoothTime = 0.3f;
     [SerializeField] private float mouseWeight = 0.1f;
     [SerializeField] private Vector3 offset;
