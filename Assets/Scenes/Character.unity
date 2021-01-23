@@ -151,6 +151,25 @@ CharacterController:
   m_SkinWidth: 0.06
   m_MinMoveDistance: 0
   m_Center: {x: 0, y: 2, z: 0}
+--- !u!114 &766654962
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 766654960}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ee6856f8c0cc6243aec7e3f6897fac4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  offset: {fileID: 766654963}
+  worldPosition: {x: 0, y: 0, z: 0}
+--- !u!4 &766654963 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 400000, guid: 2db7e17401e08b94697ecd7acce75ab1, type: 3}
+  m_PrefabInstance: {fileID: 2127555630}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &766654964
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -164,11 +183,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   movementSpeed: 4
-  speed: 12
-  gravity: -9.81
-  playerSpeed: 4
   jumpHeight: 0.2
-  velocity: {x: 0, y: 0, z: 0}
+  gravity: -9.81
+  moveSpeed: 4
+  jumpSpeed: 0.5
 --- !u!1 &869655672
 GameObject:
   m_ObjectHideFlags: 0
