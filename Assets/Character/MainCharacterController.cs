@@ -7,23 +7,16 @@ using Vector3 = UnityEngine.Vector3;
 
 public class MainCharacterController : MonoBehaviour
 {
-    private TextMesh _debugText;
-    
     private Animator _animator;
     
-    [SerializeField] private float movementSpeed = 4f;
     private Vector3 _forward, _right;
     private MousePositionInWorld _mousePosition;
     
     private CharacterController _controller;
 
-    [SerializeField] private float speed = 4f;
+    [SerializeField] private float movementSpeed = 4f;
     [SerializeField] private float gravity = -9.81f;
-
-    [SerializeField] private float playerSpeed = 4f;
     [SerializeField] private float jumpHeight = 0.2f;
-    
-    [SerializeField] private Vector3 velocity;
 
     private float _directionY;
     
@@ -33,20 +26,16 @@ public class MainCharacterController : MonoBehaviour
         _forward.y = 0;
         _forward = Vector3.Normalize(_forward);
         _right = Quaternion.Euler(new Vector3(0, 90, 0)) * _forward;
-        
+
         _mousePosition = gameObject.AddComponent<MousePositionInWorld>();
 
         _controller = gameObject.GetComponent<CharacterController>();
         _animator = gameObject.GetComponent<Animator>();
-        _debugText = gameObject.AddComponent<TextMesh>();
     }
 
     void Update()
     {
         Move();
-            
-        _debugText.text = "isGrounded " + _controller.isGrounded;
-
         WatchVelocity();
     }
 
@@ -80,6 +69,19 @@ public class MainCharacterController : MonoBehaviour
 
     void WatchVelocity()
     {
-        _animator.SetFloat("velocity", new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")).sqrMagnitude);
+        Vector3 inputDirection = new Vector3(Input.GetAxis("Horizontal") * -1, 0, Input.GetAxis("Vertical")).normalized;
+        
+        Quaternion camRot = Quaternion.LookRotation(_forward);
+        Vector3 lookDirection = camRot * ((_mousePosition.worldPosition - transform.position)).normalized;
+        
+        Quaternion lookRot = Quaternion.LookRotation(lookDirection);
+
+        Vector3 rotatedInput = lookRot * inputDirection;
+        
+        Debug.DrawLine(transform.position + Vector3.up, lookDirection);
+        Debug.DrawLine(Vector3.up, rotatedInput);
+        
+        _animator.SetFloat("velocityRight", rotatedInput.z);
+        _animator.SetFloat("velocityForward", rotatedInput.x);
     }
 }
