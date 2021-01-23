@@ -20,22 +20,16 @@ public class MainCharacterController : MonoBehaviour
 
     private float _directionY;
 
-    // private Vector3 _moveDirection;
-
     private void Awake()
     {
         _characterController = GetComponent<CharacterController>();
-    }
-
-    void Start()
-    {
+        _mousePosition = gameObject.GetComponent<MousePositionInWorld>();
+        _animator = gameObject.GetComponent<Animator>();
+        
         _forward = Camera.main.transform.forward;
         _forward.y = 0;
         _forward = Vector3.Normalize(_forward);
         _right = Quaternion.Euler(new Vector3(0, 90, 0)) * _forward;
-
-        _mousePosition = gameObject.GetComponent<MousePositionInWorld>();
-        _animator = gameObject.GetComponent<Animator>();
     }
 
     void Update()
@@ -43,30 +37,6 @@ public class MainCharacterController : MonoBehaviour
         Move();
         WatchVelocity();
     }
-
-    // private void FixedUpdate()
-    // {
-    //     float horizontal = Input.GetAxis("Horizontal");
-    //     float vertical = Input.GetAxis("Vertical");
-    //
-    //     Vector3 inputDirection = _forward * vertical + _right * horizontal;
-    //
-    //     Vector3 flatMovement = moveSpeed * Time.deltaTime * inputDirection;
-    //
-    //     _moveDirection = new Vector3(flatMovement.x, _moveDirection.y, flatMovement.z);
-    //
-    //     if (PlayerJumped)
-    //         _moveDirection.y = jumpSpeed;
-    //     else if (_characterController.isGrounded)
-    //         _moveDirection.y = 0f;
-    //     else
-    //         _moveDirection.y -= gravity * Time.deltaTime;
-    //
-    //     _characterController.Move(_moveDirection);
-    // }
-
-    private bool PlayerJumped => _characterController.isGrounded && Input.GetKey(KeyCode.Space);
-
 
     void Move()
     {
