@@ -22,14 +22,18 @@ public class MainCharacterController : MonoBehaviour
 
     private float _directionY;
 
+    private Renderer _renderer;
+
     private WheelVehicle vehicle;
 
     private void Awake()
     {
         _characterController = GetComponent<CharacterController>();
         _cameraController = Camera.main.GetComponent<CameraController>();
-        _mousePosition = gameObject.GetComponent<MousePositionInWorld>();
-        _animator = gameObject.GetComponent<Animator>();
+        _cameraController.size = 7.5f;
+        _mousePosition = GetComponent<MousePositionInWorld>();
+        _animator = GetComponent<Animator>();
+        _renderer = GetComponent<Renderer>();
         
         _forward = Camera.main.transform.forward;
         _forward.y = 0;
@@ -45,6 +49,12 @@ public class MainCharacterController : MonoBehaviour
         
         transform.position = position;
         transform.rotation = rotation;
+        
+        _cameraController.size = 7.5f;
+        
+        gameObject.SetActive(true);
+        _characterController.enabled = true;
+        _cameraController.target = transform;
     }
 
 
@@ -52,23 +62,16 @@ public class MainCharacterController : MonoBehaviour
     {
         vehicle = wheelVehicle;
         
-        // Todo: stop rendering player
+        _cameraController.size = 15;
+        
+        gameObject.SetActive(false);
+        _characterController.enabled = false;
     }
 
     void Update()
     {
-        if (vehicle != null)
-        {
-            _characterController.enabled = false;
-            return;
-        }
-        else
-        {
-            _characterController.enabled = true;
-        }
-
-        _cameraController.target = transform;
-
+        if (vehicle != null) return;
+        
         Move();
         WatchVelocity();
     }

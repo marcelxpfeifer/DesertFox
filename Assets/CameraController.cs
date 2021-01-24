@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,7 +12,14 @@ public class CameraController : MonoBehaviour
     [SerializeField] private Vector3 offset;
     private Vector3 _velocity = Vector3.zero;
     private MousePositionInWorld _mousePosition;
-    
+
+    public float size;
+
+    private void Awake()
+    {
+        size = Camera.main.orthographicSize;
+    }
+
     void Start()
     {
         _mousePosition = gameObject.AddComponent<MousePositionInWorld>();
@@ -25,5 +33,7 @@ public class CameraController : MonoBehaviour
         var targetPos = target.position + offset - (transform.position - _mousePosition.worldPosition) * mouseWeight;
         
         transform.position = Vector3.SmoothDamp(currentPos, targetPos, ref _velocity, smoothTime);
+
+        Camera.main.orthographicSize = Mathf.Lerp(Camera.main.orthographicSize, size, 0.02f);
     }
 }

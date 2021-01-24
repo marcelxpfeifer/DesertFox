@@ -39,7 +39,7 @@ namespace VehicleBehaviour {
             var engineOff = _vehicle.Handbrake || !_vehicle.IsPlayer;
             
             
-            if (state != stopping && engineOff)
+            if (state != stopping && state != null && engineOff)
             {
                 _source.clip = stopping;
                 _source.pitch = 1;

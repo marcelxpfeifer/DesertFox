@@ -1,13 +1,15 @@
+using System;
 using UnityEngine;
 
 public abstract class Interactable : MonoBehaviour
 {
+    [SerializeField] public Transform target;
     [SerializeField] public Transform player;
     [SerializeField] private GameObject outlineTarget;
     [SerializeField] private string keyCode;
     [SerializeField] private float radius;
 
-    private Outline _outline;
+    [HideInInspector] public Outline _outline;
     
     public abstract void Interact();
     private void Awake()
@@ -20,9 +22,15 @@ public abstract class Interactable : MonoBehaviour
         _outline.OutlineWidth = 1f;
     }
 
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(target.position, radius);
+    }
+
     void Update()
     {
-        float distance = (player.position - transform.position).magnitude;
+        float distance = (player.position - target.transform.position).magnitude;
 
         if (distance > radius)
         {

@@ -187,7 +187,6 @@ MonoBehaviour:
   gravity: -9.81
   moveSpeed: 4
   jumpSpeed: 0.5
-  vehicle: {fileID: 0}
 --- !u!1 &869655672
 GameObject:
   m_ObjectHideFlags: 0
@@ -242,7 +241,7 @@ Camera:
   far clip plane: 100
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 10
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2

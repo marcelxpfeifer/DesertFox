@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,7 +17,15 @@ public class Drivable : Interactable
         _wheelVehicle = GetComponent<WheelVehicle>();
         _wheelVehicle.IsPlayer = _isDriving;
     }
-    
+
+    private void LateUpdate()
+    {
+        if (_isDriving)
+        {
+            player.position = target.position;
+        }
+    }
+
     public override void Interact()
     {
         _isDriving = !_isDriving;
@@ -32,7 +41,7 @@ public class Drivable : Interactable
         {
             var vehicleTransform = _wheelVehicle.transform;
             Quaternion doorDirection = Quaternion.Euler(Quaternion.Euler(0, 90, 0) * vehicleTransform.forward);
-            Vector3 getOut = vehicleTransform.position + (Quaternion.Euler(0, -90, 0) * vehicleTransform.forward * 2);
+            Vector3 getOut = target.position + (Quaternion.Euler(0, -90, 0) * vehicleTransform.forward / 2);
             
             Debug.Log(driver);
             driver.getOutOfVehicle(getOut, doorDirection);
