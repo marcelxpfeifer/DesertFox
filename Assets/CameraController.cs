@@ -15,16 +15,12 @@ public class CameraController : MonoBehaviour
 
     public float size;
 
-    private void Awake()
-    {
-        size = Camera.main.orthographicSize;
-    }
-
-    void Start()
+    void Awake()
     {
         _mousePosition = gameObject.AddComponent<MousePositionInWorld>();
         transform.position += offset;
         transform.eulerAngles = new Vector3(45, 45, 0);
+        size = Camera.main.orthographicSize;
     }
 
     void LateUpdate()

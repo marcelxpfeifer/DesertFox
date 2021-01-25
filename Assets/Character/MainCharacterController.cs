@@ -25,7 +25,7 @@ public class MainCharacterController : MonoBehaviour
     private Renderer _renderer;
 
     private WheelVehicle vehicle;
-
+    
     private void Awake()
     {
         _characterController = GetComponent<CharacterController>();
@@ -34,7 +34,10 @@ public class MainCharacterController : MonoBehaviour
         _mousePosition = GetComponent<MousePositionInWorld>();
         _animator = GetComponent<Animator>();
         _renderer = GetComponent<Renderer>();
-        
+
+        var rightHand = transform.Find("RightHand");
+        Debug.Log(rightHand);
+
         _forward = Camera.main.transform.forward;
         _forward.y = 0;
         _forward = Vector3.Normalize(_forward);

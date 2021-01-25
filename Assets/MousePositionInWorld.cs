@@ -11,7 +11,7 @@ public class MousePositionInWorld : MonoBehaviour
     
     public Vector3 worldPosition;
 
-    private void Awake()
+    void Awake()
     {
         _plane = new Plane(Vector3.up, offset.position.y);
     }
