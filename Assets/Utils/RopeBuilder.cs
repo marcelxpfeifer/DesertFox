@@ -23,13 +23,16 @@ public class RopeBuilder : MonoBehaviour
     
     private List<Vector3> _positions = new List<Vector3>();
 
+    private Vector3 debugPosition = Vector3.down;
+
     private void Awake()
     {
         _lineRenderer = gameObject.AddComponent<LineRenderer>();
         _lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
-        _lineRenderer.positionCount = segmentCount + 1;
+        _lineRenderer.positionCount = 1;
         _lineRenderer.startColor = Color.black;
         _lineRenderer.endColor = Color.black;
+        _lineRenderer.numCornerVertices = 5;
         _lineRenderer.startWidth = 0.1f;
         _lineRenderer.endWidth = 0.1f;
         
@@ -38,6 +41,25 @@ public class RopeBuilder : MonoBehaviour
 
     void Start()
     {
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (debugPosition != Vector3.down)
+        {
+            Gizmos.color = Color.magenta;
+            Gizmos.DrawSphere(debugPosition, 0.05f);
+        }
+        
+        
+        for (int i = 0; i < _positions.Count; i++)
+        {
+            if (i == 0) continue;
+            Gizmos.color = Color.HSVToRGB((i / _positions.Count) * 360, 1, 1);
+            Gizmos.DrawSphere(_positions[i], 0.005f);
+            Gizmos.DrawWireSphere(_positions[i], 0.1f);
+        }
+        
     }
 
     void ConnectPositionsDebug()
@@ -55,26 +77,38 @@ public class RopeBuilder : MonoBehaviour
         }
     }
 
-    void Update()
+    void FixedUpdate()
     {
+        float sphereCastRadius = 0.1f;
         RaycastHit lastPosHitInfo;
-        Vector3 previousToLastPos = Vector3.down;
+        Vector3? previousToLastPos = null;
 
-        bool lPosObstructed = Physics.SphereCast(end.position, 0.1f, (_positions.Last() - end.position).normalized, out lastPosHitInfo, (_positions.Last() - end.position).magnitude - 0.01f);
+        Vector3 endToLastDirection = (_positions.Last() - end.position).normalized;
+        float endToLastDistance = (_positions.Last() - end.position).magnitude;
+
+        bool lPosObstructed = Physics.SphereCast(end.position, sphereCastRadius, endToLastDirection, out lastPosHitInfo, endToLastDistance - 0.05f);
         
         bool previousToLastPosObstructed = true;
 
-        Vector3 lPosHitPos = lastPosHitInfo.point + 0.1f * lastPosHitInfo.normal;
+        Vector3 lastPosHitPos = lastPosHitInfo.point + sphereCastRadius * lastPosHitInfo.normal;
 
-        if (lPosObstructed) _positions.Add(lastPosHitInfo.point + 0.1f * lastPosHitInfo.normal);
+        if (lPosObstructed && (lastPosHitPos - _positions.Last()).magnitude > 0.01) _positions.Add(lastPosHitPos);
         
         if (_positions.Count >= 2)
         {
             previousToLastPos = _positions[_positions.Count - 2];
-            previousToLastPosObstructed = Physics.Linecast(end.position, previousToLastPos);
+
+            Vector3 lastToEndDirection = (end.position - _positions.Last()).normalized;
+            Vector3 secondObstructionCheckpoint = _positions.Last() + lastToEndDirection * 0.1f;
+
+            Vector3 checkPointToPrevToLast = previousToLastPos.Value - secondObstructionCheckpoint;
+
+            debugPosition = secondObstructionCheckpoint;
+
+            previousToLastPosObstructed = Physics.SphereCast(secondObstructionCheckpoint, 0.09f, checkPointToPrevToLast.normalized, out _, 0.2f);
         }
         
-        if (previousToLastPos != Vector3.down && !previousToLastPosObstructed && !lPosObstructed)
+        if (previousToLastPos != null && !previousToLastPosObstructed && !lPosObstructed)
         {
             _positions.RemoveAt(_positions.Count - 1);
         }
