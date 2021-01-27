@@ -24,6 +24,8 @@ public class RopeBuilder : MonoBehaviour
     private List<Vector3> _positions = new List<Vector3>();
 
     private Vector3 debugPosition = Vector3.down;
+    
+    public bool enabled = false;
 
     private void Awake()
     {
@@ -39,10 +41,6 @@ public class RopeBuilder : MonoBehaviour
         _positions.Add(start.position);
     }
 
-    void Start()
-    {
-    }
-
     private void OnDrawGizmos()
     {
         if (debugPosition != Vector3.down)
@@ -55,7 +53,7 @@ public class RopeBuilder : MonoBehaviour
         for (int i = 0; i < _positions.Count; i++)
         {
             if (i == 0) continue;
-            Gizmos.color = Color.HSVToRGB((i / _positions.Count) * 360, 1, 1);
+            Gizmos.color = Color.HSVToRGB(i / (float)_positions.Count, 1, 1);
             Gizmos.DrawSphere(_positions[i], 0.005f);
             Gizmos.DrawWireSphere(_positions[i], 0.1f);
         }
@@ -77,8 +75,27 @@ public class RopeBuilder : MonoBehaviour
         }
     }
 
+    public void Disable()
+    {
+        enabled = false;
+        _lineRenderer.enabled = false;
+        _positions.Clear();
+    }
+
+    public void Enable()
+    {
+        enabled = true;
+        _lineRenderer.enabled = true;
+        _positions.Clear();
+        _positions.Add(start.position);
+    }
+
     void FixedUpdate()
     {
+        _lineRenderer.enabled = enabled;
+        
+        if (!enabled) return;
+        
         float sphereCastRadius = 0.1f;
         RaycastHit lastPosHitInfo;
         Vector3? previousToLastPos = null;
@@ -99,21 +116,19 @@ public class RopeBuilder : MonoBehaviour
             previousToLastPos = _positions[_positions.Count - 2];
 
             Vector3 lastToEndDirection = (end.position - _positions.Last()).normalized;
-            Vector3 secondObstructionCheckpoint = _positions.Last() + lastToEndDirection * 0.1f;
+            Vector3 secondObstructionCheckpoint = _positions.Last() + lastToEndDirection * 0.5f;
 
             Vector3 checkPointToPrevToLast = previousToLastPos.Value - secondObstructionCheckpoint;
 
             debugPosition = secondObstructionCheckpoint;
 
-            previousToLastPosObstructed = Physics.SphereCast(secondObstructionCheckpoint, 0.09f, checkPointToPrevToLast.normalized, out _, 0.2f);
+            previousToLastPosObstructed = Physics.SphereCast(secondObstructionCheckpoint, sphereCastRadius, checkPointToPrevToLast.normalized, out _, 0.5f);
         }
-        
+
         if (previousToLastPos != null && !previousToLastPosObstructed && !lPosObstructed)
         {
             _positions.RemoveAt(_positions.Count - 1);
         }
-        
-        Debug.Log(_positions.Count);
 
         ConnectPositionsDebug();
 
@@ -123,21 +138,5 @@ public class RopeBuilder : MonoBehaviour
         
         _lineRenderer.positionCount = linePos.Count;
         _lineRenderer.SetPositions(linePos.ToArray());
-        
-        // _distance = (end.position - start.position).magnitude;
-        //
-        // var points = new Vector3[segmentCount + 1];
-        //
-        // for (int i = 0; i <= segmentCount; i++)
-        // {
-        //     float t = i / (float) segmentCount;
-        //     
-        //     Vector3 segmentOffset = new Vector3(0, ropeProfile.Evaluate(t) * curveMultiplier, 0);
-        //     Vector3 position = Vector3.Lerp(start.position, end.position, t);
-        //
-        //     points[i] = position + segmentOffset;
-        // }
-        //
-        // _lineRenderer.SetPositions(points);
     }
 }
