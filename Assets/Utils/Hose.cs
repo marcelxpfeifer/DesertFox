@@ -8,11 +8,13 @@ public class Hose : MonoBehaviour
 {
     public bool enabled = false;
     public bool waterRunning = false;
+    public float hoseLength = 0;
 
+    [SerializeField] private RopeBuilder ropeBuilder;
     [SerializeField] private string waterTrigger = "Fire1";
     [SerializeField] private GameObject hose;
     [SerializeField] private ParticleSystem water;
-    
+
     private CharacterController _characterController;
     
     private void Awake()
@@ -26,6 +28,8 @@ public class Hose : MonoBehaviour
     
     void Update()
     {
+        hoseLength = ropeBuilder.ropeLength;
+        
         if (hose.activeSelf != enabled)
         {
             waterRunning = waterRunning && enabled;
@@ -35,14 +39,10 @@ public class Hose : MonoBehaviour
         }
 
         if (!enabled) return;
-        
-        Debug.DrawLine(Vector3.zero, _characterController.transform.forward * 10);
 
         if (Input.GetButtonDown(waterTrigger))
         {
             waterRunning = !waterRunning;
-            
-            Debug.Log(waterRunning);
 
             var waterEmission = water.emission;
             waterEmission.enabled = waterRunning;

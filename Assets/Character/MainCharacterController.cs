@@ -15,14 +15,9 @@ public class MainCharacterController : MonoBehaviour
 
     [SerializeField] private float movementSpeed = 4f;
     [SerializeField] private float jumpHeight = 0.2f;
-
     [SerializeField] private float gravity = 2f;
-    [SerializeField] private float moveSpeed = 10f;
-    [SerializeField] private float jumpSpeed = 0.5f;
 
     private float _directionY;
-
-    private Renderer _renderer;
 
     private WheelVehicle vehicle;
     
@@ -33,7 +28,6 @@ public class MainCharacterController : MonoBehaviour
         _cameraController.size = 7.5f;
         _mousePosition = GetComponent<MousePositionInWorld>();
         _animator = GetComponent<Animator>();
-        _renderer = GetComponent<Renderer>();
 
         var rightHand = transform.Find("RightHand");
         Debug.Log(rightHand);
@@ -65,7 +59,7 @@ public class MainCharacterController : MonoBehaviour
     {
         vehicle = wheelVehicle;
         
-        _cameraController.size = 15;
+        _cameraController.size = 20;
         
         gameObject.SetActive(false);
         _characterController.enabled = false;
@@ -98,7 +92,7 @@ public class MainCharacterController : MonoBehaviour
     
         direction.y = _directionY;
     
-        var result = _characterController.Move(direction * (movementSpeed * Time.deltaTime));
+        _characterController.Move(direction * (movementSpeed * Time.deltaTime));
 
         if (direction != Vector3.zero)
         {

@@ -26,6 +26,7 @@ public class RopeBuilder : MonoBehaviour
     private Vector3 debugPosition = Vector3.down;
     
     public bool enabled = false;
+    public float ropeLength;
 
     private void Awake()
     {
@@ -94,7 +95,11 @@ public class RopeBuilder : MonoBehaviour
     {
         _lineRenderer.enabled = enabled;
         
-        if (!enabled) return;
+        if (!enabled)
+        {
+            ropeLength = 0;
+            return;
+        }
         
         float sphereCastRadius = 0.1f;
         RaycastHit lastPosHitInfo;
@@ -135,6 +140,12 @@ public class RopeBuilder : MonoBehaviour
         List<Vector3> linePos = new List<Vector3>(_positions);
         
         linePos.Add(end.position);
+
+        ropeLength = 0;
+        for (int i = 1; i < linePos.Count; i++)
+        {
+            ropeLength += (linePos[i] - linePos[i - 1]).magnitude;
+        }
         
         _lineRenderer.positionCount = linePos.Count;
         _lineRenderer.SetPositions(linePos.ToArray());
